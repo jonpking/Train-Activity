@@ -1,4 +1,6 @@
+
 // Initialize Firebase
+
 const firebaseConfig = {
     apiKey: "AIzaSyDqfQKweo_zzigcPmpAnNSigI2k4vXBB8o",
     authDomain: "train-scheduler-ff3ee.firebaseapp.com",
@@ -55,11 +57,11 @@ database.ref().on("child_added", function (childSnapshot) {
 
     // Store everything into a variable.
     const trainName = childSnapshot.val().name;
-    const trainDest = childSnapshot.val().role;
+    const trainDest = childSnapshot.val().destination;
     const trainStart = childSnapshot.val().start;
-    const trainFreq = childSnapshot.val().rate;
+    const trainFreq = childSnapshot.val().frequency;
 
-    // Employee Info
+    // Train Info
     console.log(trainName);
     console.log(trainDest);
     console.log(trainStart);
