@@ -23,7 +23,8 @@ $("#add-train-btn").on("click", function (event) {
     // Grabs user input
     const trainName = $("#train-name-input").val().trim();
     const trainDest = $("#destination-input").val().trim();
-    const trainStart = moment($("#start-input").val().trim(), "MM/DD/YYYY").format("X");
+    console.log("User input:", $("#start-input").val().trim());
+    const trainStart = moment($("#start-input").val().trim(), "HH:mm").format("X");
     const trainFreq = $("#frequency-input").val().trim();
 
     // Creates local "temporary" object for holding train data
@@ -67,24 +68,18 @@ database.ref().on("child_added", function (childSnapshot) {
     console.log(trainStart);
     console.log(trainFreq);
 
-    // Prettify the employee start
-    // let empStartPretty = moment.unix(trainStart).format("MM/DD/YYYY");
+    // Prettify the train  start
+    let trainStartPretty = moment.unix(trainStart).format("HH:mm");
 
-    // Calculate the months worked using hardcore math
-    // To calculate the months worked
-    // let empMonths = moment().diff(moment(empStart, "X"), "months");
-    // console.log(empMonths);
 
-    // Calculate the total billed rate
-    // let empBilled = empMonths * empRate;
-    // console.log(empBilled);
 
     // Create the new row
     let newRow = $("<tr>").append(
         $("<td>").text(trainName),
         $("<td>").text(trainDest),
-        $("<td>").text(trainStart),
+        $("<td>").text(trainStartPretty),
         $("<td>").text(trainFreq),
+        $("<td>").text("-")
     );
 
     // Append the new row to the table
