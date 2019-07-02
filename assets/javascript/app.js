@@ -15,6 +15,31 @@ firebase.initializeApp(firebaseConfig);
 
 const database = firebase.database();
 
+function calculateMinutesAway(trainFreq, trainStart) {
+    // Current Time
+    let currentTime = moment();
+
+    let trainStartTime = moment(trainStart, "HH:mm");
+    
+    if (currentTime.isBefore(trainStartTime)){
+        return trainStartTime.diff(currentTime, "minutes");
+    }
+
+    // First Time (pushed back 1 year to make sure it comes before current time)
+    let startTimeConverted = trainStartTime.subtract(1, "years");
+
+    // Difference between the times
+    let diffTime = currentTime.diff(startTimeConverted, "minutes");
+
+    // Time apart (remainder)
+    let tRemainder = diffTime % trainFreq;
+
+    // Minute Until Train
+    let tMinutesTillTrain = trainFreq - tRemainder;
+
+    return tMinutesTillTrain;
+}
+
 // Button for adding train
 
 $("#add-train-btn").on("click", function (event) {
@@ -23,8 +48,7 @@ $("#add-train-btn").on("click", function (event) {
     // Grabs user input
     const trainName = $("#train-name-input").val().trim();
     const trainDest = $("#destination-input").val().trim();
-    console.log("User input:", $("#start-input").val().trim());
-    const trainStart = moment($("#start-input").val().trim(), "HH:mm").format("X");
+    const trainStart = moment($("#start-input").val().trim(), "HH:mm").format("HH:mm");
     const trainFreq = $("#frequency-input").val().trim();
 
     // Creates local "temporary" object for holding train data
@@ -38,12 +62,6 @@ $("#add-train-btn").on("click", function (event) {
     // Uploads train data to the database
     database.ref().push(newTrain);
 
-    // Logs everything to console
-    console.log(newTrain.name);
-    console.log(newTrain.destination);
-    console.log(newTrain.start);
-    console.log(newTrain.frequency);
-
     alert("Train successfully added");
 
     // Clears all of the text-boxes
@@ -54,32 +72,19 @@ $("#add-train-btn").on("click", function (event) {
 });
 
 database.ref().on("child_added", function (childSnapshot) {
-    console.log(childSnapshot.val());
-
     // Store everything into a variable.
     const trainName = childSnapshot.val().name;
     const trainDest = childSnapshot.val().destination;
     const trainStart = childSnapshot.val().start;
     const trainFreq = childSnapshot.val().frequency;
 
-    // Train Info
-    console.log(trainName);
-    console.log(trainDest);
-    console.log(trainStart);
-    console.log(trainFreq);
-
-    // Prettify the train  start
-    let trainStartPretty = moment.unix(trainStart).format("HH:mm");
-
-
-
     // Create the new row
     let newRow = $("<tr>").append(
         $("<td>").text(trainName),
         $("<td>").text(trainDest),
-        $("<td>").text(trainStartPretty),
+        $("<td>").text(trainStart),
         $("<td>").text(trainFreq),
-        $("<td>").text("-")
+        $("<td>").text(calculateMinutesAway(trainFreq, trainStart))
     );
 
     // Append the new row to the table
